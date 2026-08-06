@@ -1,0 +1,162 @@
+#include <iostream>
+#include <vector>
+#include <string>
+
+using namespace std;
+
+// ==========================================
+// Yêu cầu 1: Xây dựng lớp Nguoi
+// ==========================================
+class Nguoi {
+protected:
+    string hoTen;
+    int tuoi;
+    string queQuan;
+
+public:
+    Nguoi() {}
+
+    virtual void nhapInfo() {
+        cin.ignore(); // Xóa bộ nhớ đệm
+        cout << "Nhap ho ten: ";
+        getline(cin, hoTen);
+        cout << "Nhap tuoi: ";
+        cin >> tuoi;
+        cin.ignore();
+        cout << "Nhap que quan: ";
+        getline(cin, queQuan);
+    }
+
+    virtual void xuatInfo() {
+        cout << "Ho ten: " << hoTen << " | Tuoi: " << tuoi << " | Que quan: " << queQuan << endl;
+    }
+};
+
+// ==========================================
+// Yêu cầu 2 & 4: Xây dựng lớp CBGV và tính lương
+// ==========================================
+class CBGV : public Nguoi {
+private:
+    string msgv;
+    double luongCung;
+    double luongThuong;
+    double tienPhat;
+    double luongThucLinh;
+
+public:
+    CBGV() {}
+
+    void nhapInfo() override {
+        cout << "Nhap ma so giao vien: ";
+        cin >> msgv;
+        
+        Nguoi::nhapInfo(); // Gọi hàm nhập của lớp cha
+        
+        cout << "Nhap luong cung: ";
+        cin >> luongCung;
+        cout << "Nhap luong thuong: ";
+        cin >> luongThuong;
+        cout << "Nhap tien phat: ";
+        cin >> tienPhat;
+        
+        // Yêu cầu 4: Tính lương thực lĩnh
+        tinhLuong();
+    }
+
+    void tinhLuong() {
+        luongThucLinh = luongCung + luongThuong - tienPhat;
+    }
+
+    void xuatInfo() override {
+        cout << "MSGV: " << msgv << " | ";
+        Nguoi::xuatInfo();
+        cout << "Luong cung: " << luongCung 
+             << " | Thuong: " << luongThuong 
+             << " | Phat: " << tienPhat 
+             << " => Thuc linh: " << luongThucLinh << endl;
+    }
+
+    string getMsgv() {
+        return msgv;
+    }
+};
+
+// ==========================================
+// Yêu cầu 3: Lớp quản lý để thêm, xóa cán bộ
+// ==========================================
+class QuanLyCBGV {
+private:
+    vector<CBGV> danhSach;
+
+public:
+    void themCBGV() {
+        CBGV gv;
+        cout << "\n--- Nhap thong tin CBGV moi ---" << endl;
+        gv.nhapInfo();
+        danhSach.push_back(gv);
+        cout << "-> Them thanh cong!" << endl;
+    }
+
+    void xoaCBGV(string id) {
+        for (auto it = danhSach.begin(); it != danhSach.end(); ++it) {
+            if (it->getMsgv() == id) {
+                danhSach.erase(it);
+                cout << "-> Da xoa can bo giao vien co ma: " << id << endl;
+                return;
+            }
+        }
+        cout << "-> Khong tim thay giao vien co ma: " << id << endl;
+    }
+
+    void hienThiDanhSach() {
+        if (danhSach.empty()) {
+            cout << "Danh sach hien tai dang trong." << endl;
+            return;
+        }
+        cout << "\n--- Danh sach Can Bo Giao Vien ---" << endl;
+        for (CBGV gv : danhSach) {
+            gv.xuatInfo();
+            cout << "----------------------------------" << endl;
+        }
+    }
+};
+
+// ==========================================
+// Hàm main: Giao diện console
+// ==========================================
+int main() {
+    QuanLyCBGV ql;
+    int luaChon;
+    string maXoa;
+
+    do {
+        cout << "\n===== QUAN LY KHOA CNTT =====" << endl;
+        cout << "1. Them can bo giao vien" << endl;
+        cout << "2. Xoa can bo giao vien theo ma" << endl;
+        cout << "3. Hien thi danh sach (kem luong thuc linh)" << endl;
+        cout << "0. Thoat" << endl;
+        cout << "Nhap lua chon cua ban: ";
+        cin >> luaChon;
+
+        switch (luaChon) {
+            case 1:
+                ql.themCBGV();
+                break;
+            case 2:
+                cout << "Nhap ma so giao vien can xoa: ";
+                cin >> maXoa;
+                ql.xoaCBGV(maXoa);
+                break;
+            case 3:
+                ql.hienThiDanhSach();
+                break;
+            case 0:
+                cout << "Da thoat chuong trinh." << endl;
+                break;
+            default:
+                cout << "Lua chon khong hop le!" << endl;
+        }
+    } while (luaChon != 0);
+
+    return 0;
+}
